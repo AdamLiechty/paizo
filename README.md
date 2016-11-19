@@ -3,7 +3,10 @@
 This project was generated with [angular-cli](https://github.com/angular/angular-cli) version 1.0.0-beta.19-3.
 
 ## Development server
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+1. Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`.
+   The app will automatically reload if you change any of the source files.
+2. Run `npm start` for a dev backend server on port 4201.
+   `http://localhost:4200/api` will be automatically proxied to port 4201.
 
 ## Code scaffolding
 
