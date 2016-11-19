@@ -5,6 +5,7 @@
   "angular-cli": {},
   "scripts": {
     "start": "./start.sh",
+    "ng": "ng serve --proxy-config proxy.conf.json",
     "dist": "ng build",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
@@ -40,7 +41,6 @@
     "karma-cli": "^1.0.1",
     "karma-jasmine": "^1.0.2",
     "karma-remap-istanbul": "^0.2.1",
-    "nodemon": "^1.11.0",
     "protractor": "4.0.9",
     "ts-node": "1.2.1",
     "tslint": "3.13.0",

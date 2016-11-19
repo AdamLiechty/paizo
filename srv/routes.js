@@ -1,7 +1,7 @@
+const game = require('./handlers/game')
+
 function routes(app) {
-    app.get('/api', function (req, res) {
-      res.send({message: `Hello World`})
-    })
-} 
+    app.post('/api/games/:gameId/players', game.players.post)
+}
 
 module.exports = routes

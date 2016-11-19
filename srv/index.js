@@ -13,5 +13,6 @@ if (config.angular.serveDist) {
 
 routes(app)
 
-console.log(`http://localhost:${config.port}`)
-app.listen(config.port)
+app.listen(config.port, function() {
+    console.log(`http://localhost:${config.port}`)     
+})
