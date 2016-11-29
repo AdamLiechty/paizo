@@ -7,12 +7,12 @@ import 'rxjs/add/operator/map';
   selector: 'app-logquiz',
   template: `
     <div>
-      <div *ngIf='gameNotSignedIn()'>
+      <form *ngIf='gameNotSignedIn()'>
         <h1>{{game.name}}</h1>
         <label for='new-player-name'>Name</label>
-        <input [(ngModel)]='newPlayerName' id='new-player-name' />
+        <input [(ngModel)]='newPlayerName' name='new-player-name' />
         <button (click)=joinGame()>Join Game</button>
-      </div>
+      </form>
       <div *ngIf='gameSignedIn()'>
         <h1>{{game.name}}</h1>
         <h2>{{player.name}}</h2>

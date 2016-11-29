@@ -6,11 +6,11 @@ import 'rxjs/add/operator/map';
 @Component({
   selector: 'app-log-quiz-new',
   template: `
-    <p>
+    <form>
       <label for="new-quiz-name">Quiz name:</label>
-      <input id="new-quiz-name" [(ngModel)]=name />
-      <button (click)=createGame()>Create</button>
-    </p>
+      <input name="new-quiz-name" [(ngModel)]=name />
+      <button (click)=createGame() action="submit">Create</button>
+    </form>
   `,
   styles: []
 })
