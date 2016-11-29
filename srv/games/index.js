@@ -47,7 +47,7 @@ module.exports = {
     }
     game.players[player.id] = player
     return player
-  }
+  },
   addBigScreen(gameId, bigScreen) {
     const game = gamesById[gameId]
     if (!game) return false

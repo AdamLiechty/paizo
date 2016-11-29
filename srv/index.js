@@ -25,3 +25,5 @@ server.on('request', app)
 server.listen(config.port, function() {
     console.log(`http://localhost:${server.address().port}`)
 })
+
+module.exports = app

@@ -1,7 +1,3 @@
-const gameTypes = {
-  logQuiz: require('./logQuiz')
-}
-
 const games = require('../games')
 
 module.exports = {

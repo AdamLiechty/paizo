@@ -1,8 +1,7 @@
 'use strict'
 const url = require('url')
 const auth = require('./auth')
-const games = require('.games')
-const messenger = require('./messenger')
+const games = require('./games')
 
 const MaxMessageLength = 5000
 const bigScreenPlayerId = 'big-screen'

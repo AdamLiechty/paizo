@@ -1,4 +1,4 @@
-const games = require('./games')
+const games = require('./index')
 module.exports = {
   create
 }
@@ -11,7 +11,7 @@ function create(game) {
   if (!messageHandlers) return null
 
   return {
-    game
+    game,
     acceptMessage(player, message) {
       const handler = messageHandlers[message.type]
       if (handler) {
