@@ -18,6 +18,9 @@ describe('games', () => {
   function createQuiz(newGame, bodyErrRes) {
     post('/api/games', newGame, (err, res, body) => bodyErrRes(body, err, res))
   }
+  function createPlayer(newPlayer, game, bodyErrRes) {
+    post(`/api/games/${game.id}/players`, newPlayer, (err, res, body) => bodyErrRes(body, err, res))
+  }
 
   describe('post /api/games', () => {
     it('creates a valid game if {name, type} supplied', done => {
@@ -59,39 +62,77 @@ describe('games', () => {
       })
     })
 
-    function bigScreenWebSocket(onVerified, onClose) {
+    function bigScreenWebSocket(onMessage, onClose) {
       const ws = webSocket(`/games/${game.id}/players/big-screen`,
         () => {
           ws.send(JSON.stringify({authorization: 'anonymous'}))
         },
-        data => {
-          if (data === 'VERIFIED') onVerified()
+        data => onMessage(JSON.parse(data)),
+        onClose
+      )
+      return ws
+    }
+    function playerWebSocket(player, onMessage, onClose) {
+      const ws = webSocket(`/games/${game.id}/players/${player.id}`,
+        () => {
+          ws.send(JSON.stringify({authorization: player.secret}))
         },
+        data => onMessage(JSON.parse(data)),
         onClose
       )
       return ws
     }
 
     it('opens a big screen websocket and authenticates anonymously when connected', done => {
-      bigScreenWebSocket(done)
+      bigScreenWebSocket(msg => msg.verified && done())
     })
 
     it('rejects more than 10 big screen websockets for a single game', done => {
-      var i = 0
+      let i = 0
       function anotherWS() {
-        bigScreenWebSocket(() => {
-          i++
-          if (i < 10) {
-            anotherWS()
-          } else {
-            bigScreenWebSocket(null, (errorCode) => {
-              assert.equal(4401, errorCode, 'Should be rejected with 4401')
-              done()
-            })
+        bigScreenWebSocket((msg) => {
+          if (msg.verified) {
+            i++
+            if (i < 10) {
+              anotherWS()
+            } else {
+              bigScreenWebSocket(null, (errorCode) => {
+                assert.equal(4401, errorCode, 'Should be rejected with 4401')
+                done()
+              })
+            }
           }
         })
       }
       anotherWS()
+    })
+
+    it('receives game state to all big screen web sockets upon verification', done => {
+      let i = 0
+      function handleMessage(msg) {
+        if (msg.game.type == 'quiz') i++
+        if (i == 2) done()
+      }
+      bigScreenWebSocket(handleMessage)
+      bigScreenWebSocket(handleMessage)
+    })
+
+    it('receives broadcast of messages to all big screen web sockets', done => {
+      let i = 0
+      function handleMessage(msg) {
+        if (msg.game.state.index == 1) i++
+        if (i == 2) done()
+      }
+      bigScreenWebSocket(handleMessage)
+      bigScreenWebSocket(handleMessage)
+
+      createPlayer({name: 'Adam'}, game, (player) => {
+        const ws = playerWebSocket(player, msg => {
+          if (msg.verified) {
+            ws.send(JSON.stringify({type: 'setQuestion', index: 1}))
+          }
+        })
+      })
     })
   })
 })

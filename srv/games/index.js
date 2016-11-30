@@ -9,7 +9,7 @@ let gamesByType, gamesById = {}
 function clearAllGames() {
   // Close all web sockets
   Object.keys(gamesById).map(id => gamesById[id]).forEach(g => {
-    Object.keys(g.players).map(id => g.players[id]).forEach(p => p.ws.close())
+    Object.keys(g.players).map(id => g.players[id]).forEach(p => p.ws && p.ws.close())
     g.bigScreens.forEach(p => p.ws.close())
   })
 
@@ -21,10 +21,34 @@ function clearAllGames() {
 }
 clearAllGames()
 
+function mapValues(obj, fn) {
+  const mapped = {}
+  Object.keys(obj).forEach(key => {
+     mapped[key] = fn(obj[key])
+  })
+}
+function playerForAPI(player) {
+  return {
+    id: player.id,
+    name: player.name
+  }
+}
+function gameForAPI(game) {
+  return {
+    id: game.id,
+    name: game.name,
+    type: game.type,
+    state: game.state,
+    players: mapValues(game.players, playerForAPI)
+  }
+}
+
 module.exports = {
   clearAllGames,
   getById(id) {
-    return gamesById[id]
+    const game = gamesById[id]
+    if (!game) return null
+    return gameForAPI(game)
   },
   create(type, name) {
     const games = gamesByType[type]
@@ -34,11 +58,12 @@ module.exports = {
       id,
       name,
       type,
+      state: {},
       players: {},
       bigScreens: []
     }
     game.messenger = messengers.create(game)
-    return game
+    return gameForAPI(game)
   },
   addPlayer(gameId, name) {
     const game = gamesById[gameId]
@@ -54,7 +79,7 @@ module.exports = {
       player.isMaster = true
     }
     game.players[player.id] = player
-    return player
+    return playerForAPI(player)
   },
   addBigScreen(gameId, bigScreen) {
     const game = gamesById[gameId]
@@ -69,6 +94,7 @@ module.exports = {
     const game = gamesById[gameId]
     if (!game) return null
     const player = game.players[playerId]
-    return player || null
+    if (!player) return null
+    return playerForAPI(player)
   }
 }

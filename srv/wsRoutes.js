@@ -35,7 +35,7 @@ module.exports = function wsRoutes(webSocketServer) {
       ws.player = player
       player.ws = ws
 
-      ws.send('VERIFIED')
+      ws.send(JSON.stringify({verified: true, game: games.getById(gameId)}))
 
       clearTimeout(authTimeout)
       return true
