@@ -59,7 +59,7 @@ describe('games', () => {
       })
     })
 
-    function bigScreenWebSocket(onVerified) {
+    function bigScreenWebSocket(onVerified, onClose) {
       const ws = webSocket(`/games/${game.id}/players/big-screen`,
         () => {
           ws.send(JSON.stringify({authorization: 'anonymous'}))
@@ -67,13 +67,31 @@ describe('games', () => {
         data => {
           if (data === 'VERIFIED') onVerified()
         },
-        null
+        onClose
       )
       return ws
     }
 
     it('opens a big screen websocket and authenticates anonymously when connected', done => {
       bigScreenWebSocket(done)
+    })
+
+    it('rejects more than 10 big screen websockets for a single game', done => {
+      var i = 0
+      function anotherWS() {
+        bigScreenWebSocket(() => {
+          i++
+          if (i < 10) {
+            anotherWS()
+          } else {
+            bigScreenWebSocket(null, (errorCode) => {
+              assert.equal(4401, errorCode, 'Should be rejected with 4401')
+              done()
+            })
+          }
+        })
+      }
+      anotherWS()
     })
   })
 })

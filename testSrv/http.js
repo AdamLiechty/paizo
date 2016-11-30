@@ -11,7 +11,7 @@ module.exports = function http(host) {
       var ws = new WebSocket(`ws://${host}${url}`)
       if (onOpen) ws.on('open', onOpen)
       if (onMessage) ws.on('message', onMessage)
-      if (onClose) ws.on('close', onclose)
+      if (onClose) ws.on('close', onClose)
       return ws
     }
   }

@@ -5,8 +5,14 @@ const { uniqueId } = require('../utils')
 
 const maxBigScreensPerGame = 10
 
-let gamesByType, gamesById
+let gamesByType, gamesById = {}
 function clearAllGames() {
+  // Close all web sockets
+  Object.keys(gamesById).map(id => gamesById[id]).forEach(g => {
+    Object.keys(g.players).map(id => g.players[id]).forEach(p => p.ws.close())
+    g.bigScreens.forEach(p => p.ws.close())
+  })
+
   gamesByType = {
     quiz: {}
   }
