@@ -4,9 +4,6 @@ const { uniqueId } = require('../utils')
 
 const maxBigScreensPerGame = 10
 
-const gameTypes = {
-  logQuiz: require('./logQuiz')
-}
 const gamesByType = {
   logQuiz: {}
 }
@@ -14,7 +11,6 @@ const gamesByType = {
 const gamesById = {}
 
 module.exports = {
-  gameTypes,
   getById(id) {
     return gamesById[id]
   },

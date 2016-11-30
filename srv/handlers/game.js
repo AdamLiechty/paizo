@@ -12,7 +12,11 @@ module.exports = {
     if (!name) return res.status(400).send({error:'name required'})
     const game = games.create(type, name)
     if (!game) return res.status(400).send({error:'invalid type'})
-    res.send(game)
+    res.status(201).send({
+      id: game.id,
+      type: game.type,
+      name: game.name
+    })
   },
   players: {
     post(req, res) {

@@ -1,10 +1,13 @@
-const games = require('./index')
+const gameTypes = {
+  logQuiz: require('./logQuiz')
+}
+
 module.exports = {
   create
 }
 
 function create(game) {
-  const gameType = games.gameTypes[game.type]
+  const gameType = gameTypes[game.type]
   if (!gameType) return null
 
   const messageHandlers = gameType.messageHandlers

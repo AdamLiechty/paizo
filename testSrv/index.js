@@ -7,10 +7,21 @@ const app = require('../srv')
 
 describe('games', () => {
   describe('create', () => {
-    it('should create a valid game', () => {
-      post('/api/games', {name: 'test game'}, (err, res, body) => {
+    it('should create a valid game', done => {
+      const newGame = {
+        name: 'test game',
+        type: 'logQuiz'
+      }
+      post('/api/games', newGame, (err, res, body) => {
         assert.isNull(err)
         assert.equal(201, res.statusCode)
+        const expected = {
+          name: 'test game',
+          type: 'logQuiz',
+          id: body.id
+        }
+        assert.deepEqual(expected, body)
+        done()
       })
     })
   })
