@@ -4,7 +4,7 @@ import { Headers, Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
 @Component({
-  selector: 'app-logquiz',
+  selector: 'app-quiz',
   template: `
     <div>
       <form *ngIf='gameNotSignedIn()'>
@@ -22,7 +22,7 @@ import 'rxjs/add/operator/map';
   `,
   styles: []
 })
-export class LogQuizComponent implements OnInit {
+export class QuizComponent implements OnInit {
   paramsSub: any;
   game: any;
   player: any = null;

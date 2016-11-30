@@ -4,7 +4,7 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
 @Component({
-  selector: 'app-log-quiz-new',
+  selector: 'app-quiz-new',
   template: `
     <form>
       <label for="new-quiz-name">Quiz name:</label>
@@ -14,7 +14,7 @@ import 'rxjs/add/operator/map';
   `,
   styles: []
 })
-export class LogQuizNewComponent implements OnInit {
+export class QuizNewComponent implements OnInit {
   name: string;
   constructor(private http: Http, private router: Router, private route: ActivatedRoute) { }
 
@@ -22,7 +22,7 @@ export class LogQuizNewComponent implements OnInit {
   }
 
   createGame() {
-    this.http.post(`/api/games`, {name: this.name, type: 'logQuiz'})
+    this.http.post(`/api/games`, {name: this.name, type: 'quiz'})
       .map(res => res.json())
       .forEach(game => this.router.navigate([game.id], { relativeTo: this.route }))
   }

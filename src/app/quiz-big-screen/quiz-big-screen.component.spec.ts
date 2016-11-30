@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { LogQuizBigScreenComponent } from './log-quiz-big-screen.component';
+import { QuizBigScreenComponent } from './quiz-big-screen.component';
 
-describe('LogQuizBigScreenComponent', () => {
-  let component: LogQuizBigScreenComponent;
-  let fixture: ComponentFixture<LogQuizBigScreenComponent>;
+describe('QuizBigScreenComponent', () => {
+  let component: QuizBigScreenComponent;
+  let fixture: ComponentFixture<QuizBigScreenComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ LogQuizBigScreenComponent ]
+      declarations: [ QuizBigScreenComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LogQuizBigScreenComponent);
+    fixture = TestBed.createComponent(QuizBigScreenComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

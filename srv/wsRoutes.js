@@ -4,26 +4,27 @@ const auth = require('./auth')
 const games = require('./games')
 
 const MaxMessageLength = 5000
+const AuthTimeoutMilliseconds = 2000
 const bigScreenPlayerId = 'big-screen'
 
 module.exports = function wsRoutes(webSocketServer) {
   webSocketServer.on('connection', function connection(ws) {
     const location = url.parse(ws.upgradeReq.url, true)
-    console.log(`websocket connected: ${ws.upgradeReq.url}`)
 
     const urlParts = ws.upgradeReq.url.split('/')
-    if (urlParts.length < 3) return ws.close(4404)
+    if (urlParts.length < 5 || urlParts[1] !== 'games' || urlParts[3] !== 'players') return ws.close(4404)
 
-    const gameId = urlParts[1]
-    const playerId = urlParts[2]
+    const gameId = urlParts[2]
+    const playerId = urlParts[4]
     let player = null, socket = null
 
-    const authTimeout = setTimeout(() => ws.close(4401), 5000)
+    const authTimeout = setTimeout(() => ws.close(4401), AuthTimeoutMilliseconds)
     function handleAuthorization(message) {
       if (socket || !message.authorization) return false
       if (playerId === bigScreenPlayerId) {
+        if (message.authorization !== 'anonymous') return false
         player = {playerId: 'big-screen', ws}
-        if (!games.addBigScreenSocket(gameId, player)) return false
+        if (!games.addBigScreen(gameId, player)) return false
       } else {
         const requestedPlayer = games.getPlayer(gameId, playerId)
         if (!requestedPlayer || !auth.isPlayerVerified(requestedPlayer, message.authorization)) return false
@@ -48,28 +49,27 @@ module.exports = function wsRoutes(webSocketServer) {
       }
     })
 
-    function handleJSON(rawMessage) {
-      if (rawMessage.length > MaxMessageLength) return false
-      let message
-      try {
-        message = JSON.parse(rawMessage)
-      } catch (e) {
-        return false
-      }
-
+    function handleGameMessage(message) {
       if (ws.player && ws.player.game && !ws.player.playerId===bigScreenPlayerId) {
-        ws.player.game.messenger.acceptMessage(ws.player, message)
+        return ws.player.game.messenger.acceptMessage(ws.player, message)
       }
       return true
     }
 
-    ws.on('message', function incoming(message) {
+    ws.on('message', function incoming(rawMessage) {
+      if (rawMessage.length > MaxMessageLength) return false
+
+      let message
+      try {
+        message = JSON.parse(rawMessage)
+      } catch (e) {
+        return
+      }
 
       if (handleAuthorization(message)) return
       if (!socket) return ws.close(4401)
 
-      if (handleJSON(message)) return
-
+      if (handleGameMessage(message)) return
     })
   })
 }

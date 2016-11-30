@@ -1,28 +1,79 @@
 'use strict'
+process.env.NODE_ENV = 'test'
 const {assert} = require('chai')
 const childProcess = require('child_process')
 const config = require('config')
-const {post} = require('./http')(`http://localhost:${config.port}`)
+const {post, webSocket} = require('./http')(`localhost:${config.port}`)
+const WebSocket = require('ws')
 const app = require('../srv')
+const {clearAllGames} = require('../srv/games')
 
 describe('games', () => {
-  describe('create', () => {
-    it('should create a valid game', done => {
-      const newGame = {
-        name: 'test game',
-        type: 'logQuiz'
-      }
-      post('/api/games', newGame, (err, res, body) => {
-        assert.isNull(err)
+  afterEach(clearAllGames)
+
+  const testQuiz = {
+    name: 'test game',
+    type: 'quiz'
+  }
+  function createQuiz(newGame, bodyErrRes) {
+    post('/api/games', newGame, (err, res, body) => bodyErrRes(body, err, res))
+  }
+
+  describe('post /api/games', () => {
+    it('creates a valid game if {name, type} supplied', done => {
+      createQuiz(testQuiz, (body, err, res) => {
         assert.equal(201, res.statusCode)
         const expected = {
           name: 'test game',
-          type: 'logQuiz',
+          type: 'quiz',
           id: body.id
         }
         assert.deepEqual(expected, body)
         done()
       })
+    })
+
+    it('yields 400 if name is missing', done => {
+      createQuiz({type: 'quiz'}, (body, err, res) => {
+        assert.equal(400, res.statusCode)
+        assert.deepEqual(body, {message: 'name required'})
+        done()
+      })
+    })
+
+    it('yields 400 if type is not an expected game type', done => {
+      createQuiz({name: 'my name', type: 'nonexistent'}, (body, err, res) => {
+        assert.equal(400, res.statusCode)
+        assert(body.message.startsWith('invalid type'))
+        done()
+      })
+    })
+  })
+
+  describe('big screen websocket /games/{gameId}/players/big-screen', () => {
+    let game
+    beforeEach(done => {
+      createQuiz(testQuiz, (quiz) => {
+        game = quiz
+        done()
+      })
+    })
+
+    function bigScreenWebSocket(onVerified) {
+      const ws = webSocket(`/games/${game.id}/players/big-screen`,
+        () => {
+          ws.send(JSON.stringify({authorization: 'anonymous'}))
+        },
+        data => {
+          if (data === 'VERIFIED') onVerified()
+        },
+        null
+      )
+      return ws
+    }
+
+    it('opens a big screen websocket and authenticates anonymously when connected', done => {
+      bigScreenWebSocket(done)
     })
   })
 })

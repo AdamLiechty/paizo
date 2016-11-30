@@ -9,9 +9,9 @@ module.exports = {
   },
   post(req, res) {
     const { type, name } = req.body
-    if (!name) return res.status(400).send({error:'name required'})
+    if (!name) return res.status(400).send({message:'name required'})
     const game = games.create(type, name)
-    if (!game) return res.status(400).send({error:'invalid type'})
+    if (!game) return res.status(400).send({message:'invalid type'})
     res.status(201).send({
       id: game.id,
       type: game.type,
@@ -22,7 +22,7 @@ module.exports = {
     post(req, res) {
       const { gameId } = req.params
       const { name } = req.body
-      if (!name) return res.status(400).send({error:'name required'})
+      if (!name) return res.status(400).send({message:'name required'})
       const player = games.addPlayer(gameId, name)
       if (!player) return res.status(404).send()
       res.send(player)

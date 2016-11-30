@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { LogQuizComponent } from './log-quiz/log-quiz.component'
-import { LogQuizNewComponent } from './log-quiz-new/log-quiz-new.component'
-import { LogQuizBigScreenComponent } from './log-quiz-big-screen/log-quiz-big-screen.component'
+import { QuizComponent } from './quiz/quiz.component'
+import { QuizNewComponent } from './quiz-new/quiz-new.component'
+import { QuizBigScreenComponent } from './quiz-big-screen/quiz-big-screen.component'
 
 const routes: Routes = [
-  { path: 'log-quizzes', component: LogQuizNewComponent },
-  { path: 'log-quizzes/:id', component: LogQuizComponent },
-  { path: 'log-quizzes/:id/big-screen', component: LogQuizBigScreenComponent },
-  { path: '', redirectTo: '/log-quizzes', pathMatch: 'full' }
+  { path: 'quizzes', component: QuizNewComponent },
+  { path: 'quizzes/:id', component: QuizComponent },
+  { path: 'quizzes/:id/big-screen', component: QuizBigScreenComponent },
+  { path: '', redirectTo: '/quizzes', pathMatch: 'full' }
 ];
 
 @NgModule({

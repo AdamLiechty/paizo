@@ -1,16 +1,22 @@
+'use strict'
 const keygen = require('keygen')
 const messengers = require('./messengers')
 const { uniqueId } = require('../utils')
 
 const maxBigScreensPerGame = 10
 
-const gamesByType = {
-  logQuiz: {}
-}
+let gamesByType, gamesById
+function clearAllGames() {
+  gamesByType = {
+    quiz: {}
+  }
 
-const gamesById = {}
+  gamesById = {}
+}
+clearAllGames()
 
 module.exports = {
+  clearAllGames,
   getById(id) {
     return gamesById[id]
   },

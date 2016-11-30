@@ -1,8 +1,9 @@
 const gameTypes = {
-  logQuiz: require('./logQuiz')
+  quiz: require('./quiz')
 }
 
 module.exports = {
+  gameTypes,
   create
 }
 
@@ -19,7 +20,9 @@ function create(game) {
       const handler = messageHandlers[message.type]
       if (handler) {
         handler(player.game, player, message)
+        return true
       }
+      return false
     },
     broadcastPlayerMessage(message) {
       for (var i = 0; i < game.players.length; i++) {

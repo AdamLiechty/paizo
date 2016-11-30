@@ -9,12 +9,13 @@ const server = require('http').createServer()
 const WebSocketServer = require('ws').Server
 const webSocketServer = new WebSocketServer({server})
 
-console.log(`NODE ENVIRONMENT: ${process.env.NODE_ENV}`)
+const isTest = process.env.NODE_ENV === 'test'
+if (!isTest) console.log(`NODE ENVIRONMENT: ${process.env.NODE_ENV}`)
 
 if (config.angular.serveDist) {
     require('./angular').serveDist(app)
 } else {
-    console.log(`Not serving angular dist/ folder. Be sure to run 'npm run ng'.`)
+    if (!isTest) console.log(`Not serving angular dist/ folder. Be sure to run 'npm run ng'.`)
 }
 
 app.use(bodyParser.json())
@@ -23,7 +24,7 @@ wsRoutes(webSocketServer)
 
 server.on('request', app)
 server.listen(config.port, function() {
-    console.log(`http://localhost:${server.address().port}`)
+    if (!isTest) console.log(`http://localhost:${server.address().port}`)
 })
 
 module.exports = app

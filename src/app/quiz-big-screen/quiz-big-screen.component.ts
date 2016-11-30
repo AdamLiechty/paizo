@@ -4,7 +4,7 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
 @Component({
-  selector: 'app-log-quiz-big-screen',
+  selector: 'app-quiz-big-screen',
   template: `
   <div *ngIf=game>
     <h1>{{game.name}}</h1>
@@ -12,7 +12,7 @@ import 'rxjs/add/operator/map';
   `,
   styles: []
 })
-export class LogQuizBigScreenComponent implements OnInit {
+export class QuizBigScreenComponent implements OnInit {
   paramsSub: any;
   game: any;
 

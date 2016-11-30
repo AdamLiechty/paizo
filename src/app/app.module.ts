@@ -5,16 +5,16 @@ import { HttpModule } from '@angular/http';
 import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
-import { LogQuizComponent } from './log-quiz/log-quiz.component';
-import { LogQuizNewComponent } from './log-quiz-new/log-quiz-new.component';
-import { LogQuizBigScreenComponent } from './log-quiz-big-screen/log-quiz-big-screen.component';
+import { QuizComponent } from './quiz/quiz.component';
+import { QuizNewComponent } from './quiz-new/quiz-new.component';
+import { QuizBigScreenComponent } from './quiz-big-screen/quiz-big-screen.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LogQuizComponent,
-    LogQuizNewComponent,
-    LogQuizBigScreenComponent
+    QuizComponent,
+    QuizNewComponent,
+    QuizBigScreenComponent
   ],
   imports: [
     BrowserModule,
