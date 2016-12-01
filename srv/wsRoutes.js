@@ -1,6 +1,5 @@
 'use strict'
 const url = require('url')
-const auth = require('./auth')
 const games = require('./games')
 
 const MaxMessageLength = 5000
@@ -26,8 +25,8 @@ module.exports = function wsRoutes(webSocketServer) {
         player = {playerId: 'big-screen', ws}
         if (!games.addBigScreen(gameId, player)) return false
       } else {
-        const requestedPlayer = games.getPlayer(gameId, playerId)
-        if (!requestedPlayer || !auth.isPlayerVerified(requestedPlayer, message.authorization)) return false
+        const requestedPlayer = games.getRawPlayer(gameId, playerId)
+        if (!requestedPlayer || requestedPlayer.secret !== message.authorization) return false
         player = requestedPlayer
       }
       socket = ws
@@ -50,7 +49,7 @@ module.exports = function wsRoutes(webSocketServer) {
     })
 
     function handleGameMessage(message) {
-      if (ws.player && ws.player.game && !ws.player.playerId===bigScreenPlayerId) {
+      if (ws.player && ws.player.game && ws.player.id !== bigScreenPlayerId) {
         return ws.player.game.messenger.acceptMessage(ws.player, message)
       }
       return true

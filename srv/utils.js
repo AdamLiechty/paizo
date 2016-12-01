@@ -2,6 +2,9 @@ const consonants = 'bcdgjklmnpqrstvwxyz'
 const vowels = 'aeiou'
 
 module.exports = {
+  pick(o, ...props) {
+    return Object.assign({}, ...props.map(prop => ({[prop]: o[prop]})))
+  },
   uniqueId(length = 3) {
     var id = ''
     for (var i = 0; i < length; i++) {

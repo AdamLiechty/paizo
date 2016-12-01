@@ -2,6 +2,7 @@
 const keygen = require('keygen')
 const messengers = require('./messengers')
 const { uniqueId } = require('../utils')
+const { gameForAPI, playerForAPI, mapValues } = require('./utils')
 
 const maxBigScreensPerGame = 10
 
@@ -20,28 +21,6 @@ function clearAllGames() {
   gamesById = {}
 }
 clearAllGames()
-
-function mapValues(obj, fn) {
-  const mapped = {}
-  Object.keys(obj).forEach(key => {
-     mapped[key] = fn(obj[key])
-  })
-}
-function playerForAPI(player) {
-  return {
-    id: player.id,
-    name: player.name
-  }
-}
-function gameForAPI(game) {
-  return {
-    id: game.id,
-    name: game.name,
-    type: game.type,
-    state: game.state,
-    players: mapValues(game.players, playerForAPI)
-  }
-}
 
 module.exports = {
   clearAllGames,
@@ -79,7 +58,9 @@ module.exports = {
       player.isMaster = true
     }
     game.players[player.id] = player
-    return playerForAPI(player)
+    const ret = playerForAPI(player)
+    ret.secret = player.secret
+    return ret
   },
   addBigScreen(gameId, bigScreen) {
     const game = gamesById[gameId]
@@ -90,11 +71,11 @@ module.exports = {
     }
     return false
   },
-  getPlayer(gameId, playerId) {
+  getRawPlayer(gameId, playerId) {
     const game = gamesById[gameId]
     if (!game) return null
     const player = game.players[playerId]
     if (!player) return null
-    return playerForAPI(player)
+    return player
   }
 }

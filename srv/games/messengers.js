@@ -1,3 +1,5 @@
+const { gameForAPI, playerForAPI } = require('./utils')
+
 const gameTypes = {
   quiz: require('./quiz')
 }
@@ -19,18 +21,18 @@ function create(game) {
     acceptMessage(player, message) {
       const handler = messageHandlers[message.type]
       if (handler) {
-        handler(player.game, player, message)
+        handler(gameForAPI(player.game), playerForAPI(player), message, player.game.messenger)
         return true
       }
       return false
     },
     broadcastPlayerMessage(message) {
-      for (var i = 0; i < game.players.length; i++) {
-        const player = game.players[i]
+      Object.keys(game.players).forEach(playerId => {
+        const player = game.players[playerId]
         if (player.ws) {
           player.ws.send(JSON.stringify(message))
         }
-      }
+      })
     },
     sendMasterMessage(message) {
       if (game.master && game.master.ws) {
@@ -38,7 +40,11 @@ function create(game) {
       }
     },
     sendBigScreenMessage(message) {
-      // TODO
+      game.bigScreens.forEach(screen => {
+        if (screen.ws) {
+          screen.ws.send(JSON.stringify(message))
+        }
+      })
     }
   }
 }

@@ -1,7 +1,10 @@
 const messageHandlers = {
-  startGame(game, player, message) {
+  setQuestion(game, player, message, messenger) {
     if (player.isMaster) {
-      game.messenger.broadcastPlayerMessage({ type: 'gameStarted' })
+      game.state.index = message.index
+      
+      messenger.broadcastPlayerMessage({ game })
+      messenger.sendBigScreenMessage({ game })
     }
   }
 }

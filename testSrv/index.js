@@ -131,7 +131,7 @@ describe('games', () => {
           if (msg.verified) {
             ws.send(JSON.stringify({type: 'setQuestion', index: 1}))
           }
-        })
+        }, () => console.log('closed'))
       })
     })
   })
