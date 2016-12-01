@@ -53,7 +53,7 @@ describe('games', () => {
     })
   })
 
-  describe('big screen websocket /games/{gameId}/players/big-screen', () => {
+  describe('web sockets', () => {
     let game
     beforeEach(done => {
       createQuiz(testQuiz, (quiz) => {
@@ -83,56 +83,80 @@ describe('games', () => {
       return ws
     }
 
-    it('opens a big screen websocket and authenticates anonymously when connected', done => {
-      bigScreenWebSocket(msg => msg.verified && done())
-    })
+    describe('big screen websocket /games/{gameId}/players/big-screen', () => {
 
-    it('rejects more than 10 big screen websockets for a single game', done => {
-      let i = 0
-      function anotherWS() {
-        bigScreenWebSocket((msg) => {
-          if (msg.verified) {
-            i++
-            if (i < 10) {
-              anotherWS()
-            } else {
-              bigScreenWebSocket(null, (errorCode) => {
-                assert.equal(4401, errorCode, 'Should be rejected with 4401')
-                done()
+      it('opens a big screen websocket and authenticates anonymously when connected', done => {
+        bigScreenWebSocket(msg => msg.verified && done())
+      })
+
+      it('rejects more than 10 big screen websockets for a single game', done => {
+        let i = 0
+        function anotherWS() {
+          bigScreenWebSocket((msg) => {
+            if (msg.verified) {
+              i++
+              if (i < 10) {
+                anotherWS()
+              } else {
+                bigScreenWebSocket(null, (errorCode) => {
+                  assert.equal(4401, errorCode, 'Should be rejected with 4401')
+                  done()
+                })
+              }
+            }
+          })
+        }
+        anotherWS()
+      })
+
+      it('receives game state to all big screen web sockets upon verification', done => {
+        let i = 0
+        function handleMessage(msg) {
+          if (msg.game.type == 'quiz') i++
+          if (i == 2) done()
+        }
+        bigScreenWebSocket(handleMessage)
+        bigScreenWebSocket(handleMessage)
+      })
+
+      it('receives broadcast of messages to all big screen web sockets', done => {
+        let i = 0
+        function handleMessage(msg) {
+          if (msg.game.state.index == 1) i++
+          if (i == 2) done()
+        }
+        bigScreenWebSocket(handleMessage)
+        bigScreenWebSocket(handleMessage)
+
+        createPlayer({name: 'Adam'}, game, player => {
+          const ws = playerWebSocket(player, msg => {
+            if (msg.verified) {
+              ws.send(JSON.stringify({type: 'setQuestion', index: 1}))
+            }
+          })
+        })
+      })
+    }) // big screen web socket
+
+    describe('player websocket /games/{gameId}/players/{playerId}', () => {
+      it('receives messages broadcast to players', done => {
+        createPlayer({name: 'Master Chief'}, game, player => {
+          const masterWS = playerWebSocket(player, msg => {
+            if (msg.verified) {
+              createPlayer({name: 'Grunt'}, game, player => {
+                const otherWS = playerWebSocket(player, msg => {
+                  if (msg.verified) {
+                    masterWS.send(JSON.stringify({type: 'setQuestion', index: 1}))
+                  }
+                  if (msg.game.state.index === 1) {
+                    done()
+                  }
+                })
               })
             }
-          }
+          })
         })
-      }
-      anotherWS()
-    })
-
-    it('receives game state to all big screen web sockets upon verification', done => {
-      let i = 0
-      function handleMessage(msg) {
-        if (msg.game.type == 'quiz') i++
-        if (i == 2) done()
-      }
-      bigScreenWebSocket(handleMessage)
-      bigScreenWebSocket(handleMessage)
-    })
-
-    it('receives broadcast of messages to all big screen web sockets', done => {
-      let i = 0
-      function handleMessage(msg) {
-        if (msg.game.state.index == 1) i++
-        if (i == 2) done()
-      }
-      bigScreenWebSocket(handleMessage)
-      bigScreenWebSocket(handleMessage)
-
-      createPlayer({name: 'Adam'}, game, (player) => {
-        const ws = playerWebSocket(player, msg => {
-          if (msg.verified) {
-            ws.send(JSON.stringify({type: 'setQuestion', index: 1}))
-          }
-        }, () => console.log('closed'))
       })
-    })
-  })
-})
+    }) // player web socket
+  }) // web sockets
+}) // games
