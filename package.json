@@ -9,6 +9,7 @@
     "dist": "ng build",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
+    "testSrv": "mocha ./testSrv",
     "pree2e": "webdriver-manager update",
     "e2e": "protractor"
   },

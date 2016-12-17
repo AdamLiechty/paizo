@@ -6,18 +6,25 @@ const MaxMessageLength = 5000
 const AuthTimeoutMilliseconds = 2000
 const bigScreenPlayerId = 'big-screen'
 
+function authFail(ws, reason) {
+  console.log('auth fail')
+  ws.send(JSON.stringify({message: 'authorization invalid', reason}))
+  ws.close(4401)
+}
+
 module.exports = function wsRoutes(webSocketServer) {
   webSocketServer.on('connection', function connection(ws) {
     const location = url.parse(ws.upgradeReq.url, true)
 
     const urlParts = ws.upgradeReq.url.split('/')
-    if (urlParts.length < 5 || urlParts[1] !== 'games' || urlParts[3] !== 'players') return ws.close(4404)
+    if (urlParts.length < 6 || urlParts[1] !== 'ws' || urlParts[2] !== 'games' || urlParts[4] !== 'players') return ws.close(4404)
 
-    const gameId = urlParts[2]
-    const playerId = urlParts[4]
+    const gameId = urlParts[3]
+    const playerId = urlParts[5]
     let player = null, socket = null
+    ws.send(JSON.stringify({message:'connected'}))
 
-    const authTimeout = setTimeout(() => ws.close(4401), AuthTimeoutMilliseconds)
+    const authTimeout = setTimeout(() => authFail(ws, 'timeout'), AuthTimeoutMilliseconds)
     function handleAuthorization(message) {
       if (socket || !message.authorization) return false
       if (playerId === bigScreenPlayerId) {
@@ -66,7 +73,9 @@ module.exports = function wsRoutes(webSocketServer) {
       }
 
       if (handleAuthorization(message)) return
-      if (!socket) return ws.close(4401)
+      if (!socket) {
+        return authFail(ws, 'not authorized')
+      }
 
       if (handleGameMessage(message)) return
     })

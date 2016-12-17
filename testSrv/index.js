@@ -63,17 +63,15 @@ describe('games', () => {
     })
 
     function bigScreenWebSocket(onMessage, onClose) {
-      const ws = webSocket(`/games/${game.id}/players/big-screen`,
-        () => {
-          ws.send(JSON.stringify({authorization: 'anonymous'}))
-        },
-        data => onMessage(JSON.parse(data)),
+      const ws = webSocket(`/ws/games/${game.id}/players/big-screen`,
+        () => ws.send(JSON.stringify({authorization: 'anonymous'})),
+        data => onMessage && onMessage(JSON.parse(data)),
         onClose
       )
       return ws
     }
     function playerWebSocket(player, onMessage, onClose) {
-      const ws = webSocket(`/games/${game.id}/players/${player.id}`,
+      const ws = webSocket(`/ws/games/${game.id}/players/${player.id}`,
         () => {
           ws.send(JSON.stringify({authorization: player.secret}))
         },
@@ -83,7 +81,7 @@ describe('games', () => {
       return ws
     }
 
-    describe('big screen websocket /games/{gameId}/players/big-screen', () => {
+    describe('big screen websocket /ws/games/{gameId}/players/big-screen', () => {
 
       it('opens a big screen websocket and authenticates anonymously when connected', done => {
         bigScreenWebSocket(msg => msg.verified && done())
@@ -112,7 +110,7 @@ describe('games', () => {
       it('receives game state to all big screen web sockets upon verification', done => {
         let i = 0
         function handleMessage(msg) {
-          if (msg.game.type == 'quiz') i++
+          if (msg.game && msg.game.type == 'quiz') i++
           if (i == 2) done()
         }
         bigScreenWebSocket(handleMessage)
@@ -122,7 +120,7 @@ describe('games', () => {
       it('receives broadcast of messages to all big screen web sockets', done => {
         let i = 0
         function handleMessage(msg) {
-          if (msg.game.state.index == 1) i++
+          if (msg.game && msg.game.state.index == 1) i++
           if (i == 2) done()
         }
         bigScreenWebSocket(handleMessage)
@@ -138,7 +136,7 @@ describe('games', () => {
       })
     }) // big screen web socket
 
-    describe('player websocket /games/{gameId}/players/{playerId}', () => {
+    describe('player websocket /ws/games/{gameId}/players/{playerId}', () => {
       it('receives messages broadcast to players', done => {
         createPlayer({name: 'Master Chief'}, game, player => {
           const masterWS = playerWebSocket(player, msg => {
@@ -148,7 +146,7 @@ describe('games', () => {
                   if (msg.verified) {
                     masterWS.send(JSON.stringify({type: 'setQuestion', index: 1}))
                   }
-                  if (msg.game.state.index === 1) {
+                  if (msg.game && msg.game.state.index === 1) {
                     done()
                   }
                 })
