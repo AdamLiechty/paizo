@@ -99,7 +99,9 @@ export class QuizComponent implements OnInit {
     this.ws.subscribe(
       msg => {
         console.log(JSON.parse(msg.data))
-      }
+      },
+      null,
+      () => console.log('disconnected')
     )
 
     this.ws.next({authorization: this.player.secret})

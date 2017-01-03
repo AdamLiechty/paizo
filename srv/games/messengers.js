@@ -1,8 +1,6 @@
 const { gameForAPI, playerForAPI } = require('./utils')
 
-const gameTypes = {
-  quiz: require('./quiz')
-}
+const gameTypes = require('./types')
 
 module.exports = {
   gameTypes,
@@ -21,7 +19,8 @@ function create(game) {
     acceptMessage(player, message) {
       const handler = messageHandlers[message.type]
       if (handler) {
-        handler(gameForAPI(player.game), playerForAPI(player), message, player.game.messenger)
+        const newState = handler(gameForAPI(player.game), playerForAPI(player), message, player.game.messenger)
+        if (newState != null) player.game.state = newState
         return true
       }
       return false

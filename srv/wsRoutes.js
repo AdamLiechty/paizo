@@ -7,7 +7,6 @@ const AuthTimeoutMilliseconds = 2000
 const bigScreenPlayerId = 'big-screen'
 
 function authFail(ws, reason) {
-  console.log('auth fail')
   ws.send(JSON.stringify({message: 'authorization invalid', reason}))
   ws.close(4401)
 }

@@ -13,5 +13,12 @@ module.exports = {
       id += buf[bufIndex]
     }
     return id
+  },
+  iMerge(...args) {
+    return Object.assign({}, ...args)
+  },
+  getOrDefault(o, key, value) {
+    if (o[key] == null) o[key] = value
+    return o[key]
   }
 }

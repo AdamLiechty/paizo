@@ -3,6 +3,7 @@ const keygen = require('keygen')
 const messengers = require('./messengers')
 const { uniqueId } = require('../utils')
 const { gameForAPI, playerForAPI, mapValues } = require('./utils')
+const gameTypes = require('./types')
 
 const maxBigScreensPerGame = 10
 
@@ -31,13 +32,14 @@ module.exports = {
   },
   create(type, name) {
     const games = gamesByType[type]
+    const gameType = gameTypes[type]
     if (!games) return null
     const id = uniqueId()
     const game = games[id] = gamesById[id] = {
       id,
       name,
       type,
-      state: {},
+      state: gameType.initialState || {},
       players: {},
       bigScreens: []
     }
